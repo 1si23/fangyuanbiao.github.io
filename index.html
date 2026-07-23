@@ -1,0 +1,559 @@
+<222 html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>南京 · 房源价格表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f2f5fa;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px -12px rgba(0, 20, 40, 0.12);
+            padding: 28px 24px 32px;
+            transition: all 0.2s;
+        }
+
+        /* 头部 */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #eef2f8;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: #0b1a33;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #4a5b7a;
+        }
+
+        .stats-badge {
+            background: #eef4ff;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1f3a6b;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            margin-bottom: 28px;
+            background: #f8faff;
+            padding: 14px 18px;
+            border-radius: 40px;
+            align-items: center;
+            border: 1px solid #e2eaf3;
+        }
+
+        .filter-bar label {
+            font-weight: 500;
+            color: #1f3a5e;
+            font-size: 0.9rem;
+        }
+
+        .filter-bar select, 
+        .filter-bar input {
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid #d6e0ec;
+            background: white;
+            font-size: 0.9rem;
+            color: #0b1f3b;
+            outline: none;
+            transition: 0.2s;
+            min-width: 130px;
+        }
+
+        .filter-bar select:focus,
+        .filter-bar input:focus {
+            border-color: #5d7fb0;
+            box-shadow: 0 0 0 3px rgba(55, 100, 180, 0.08);
+        }
+
+        .filter-bar .reset-btn {
+            background: #eef2f8;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            color: #1f3a6b;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        .filter-bar .reset-btn:hover {
+            background: #dce6f2;
+        }
+
+        .filter-bar .price-input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-bar .price-input-group input {
+            width: 90px;
+            min-width: 70px;
+        }
+
+        /* 卡片网格 */
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+            margin-top: 6px;
+        }
+
+        .property-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 18px 18px 16px;
+            border: 1px solid #eef2f8;
+            transition: 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 20, 40, 0.02);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .property-card:hover {
+            transform: translateY(-3px);
+            border-color: #cbd9eb;
+            box-shadow: 0 12px 28px -8px rgba(18, 52, 106, 0.08);
+        }
+
+        /* 门店 + 地址 */
+        .store-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #0b1f3b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .store-address {
+            font-size: 0.8rem;
+            color: #5a7298;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .store-address .addr-tag {
+            background: #f0f4fc;
+            padding: 0 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #2f4d7a;
+        }
+
+        .room-badge {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #0d2b4f;
+            margin: 6px 0 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            margin: 6px 0 8px;
+        }
+
+        .price-original {
+            font-size: 1rem;
+            color: #7b8fb0;
+            text-decoration: line-through;
+            text-decoration-color: #b4c4de;
+            background: #f5f8fc;
+            padding: 0 12px 0 8px;
+            border-radius: 30px;
+            line-height: 1.8;
+        }
+
+        .price-sale {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #0d2b4f;
+            background: #eaf1fb;
+            padding: 0 16px 0 14px;
+            border-radius: 40px;
+            line-height: 1.6;
+        }
+
+        .price-sale small {
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #2f4d7a;
+            margin-left: 2px;
+        }
+
+        .price-only {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #0d2b4f;
+            background: #eaf1fb;
+            padding: 0 16px 0 14px;
+            border-radius: 40px;
+            line-height: 1.6;
+            display: inline-block;
+        }
+
+        .price-only small {
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #2f4d7a;
+        }
+
+        .meta-footer {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2eaf3;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 16px;
+            font-size: 0.8rem;
+            color: #4f6587;
+        }
+
+        .meta-footer .tag {
+            background: #f2f6fe;
+            padding: 2px 14px;
+            border-radius: 30px;
+            color: #1b3a66;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .meta-footer .note {
+            color: #6a7f9e;
+        }
+
+        .no-result {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7d9c;
+            font-size: 1.1rem;
+            background: #fafcff;
+            border-radius: 40px;
+            border: 1px dashed #c9d6e8;
+        }
+
+        .footer-bar {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid #eef2f8;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #7a8fa8;
+            font-size: 0.85rem;
+        }
+
+        .footer-bar span {
+            background: #f5f8fe;
+            padding: 2px 16px;
+            border-radius: 40px;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 16px 12px; }
+            .header h1 { font-size: 1.4rem; }
+            .filter-bar { border-radius: 20px; padding: 12px 14px; }
+            .property-grid { grid-template-columns: 1fr; }
+            .price-sale, .price-only { font-size: 1.3rem; }
+            .filter-bar .reset-btn { margin-left: 0; width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- 头部 -->
+    <div class="header">
+        <h1>
+            🏠 南京 · 房源价格表
+            <small>门店汇总</small>
+        </h1>
+        <div class="stats-badge" id="statsDisplay">共 0 套</div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+        <label for="storeFilter">🏢 门店</label>
+        <select id="storeFilter">
+            <option value="">全部</option>
+        </select>
+
+        <label for="priceMin">💰 价格</label>
+        <div class="price-input-group">
+            <input type="number" id="priceMin" placeholder="最低" min="0" step="100">
+            <span>—</span>
+            <input type="number" id="priceMax" placeholder="最高" min="0" step="100">
+        </div>
+
+        <button class="reset-btn" id="resetFilterBtn">重置筛选</button>
+    </div>
+
+    <!-- 卡片列表 -->
+    <div class="property-grid" id="cardContainer">
+        <!-- 动态渲染 -->
+    </div>
+
+    <div class="footer-bar">
+        <span>📋 点击卡片查看详情</span>
+        <span id="footerCount">0 条房源</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- 原始数据（完全依据Excel） -----
+        const rawData = [
+            // 和会街店
+            { store: '和会街店', address: '和会街75号', room: '409', original: null, sale: 1880, note: '' },
+            { store: '和会街店', address: '和会街75号', room: '308', original: null, sale: 2080, note: '' },
+            { store: '和会街店', address: '和会街75号', room: '408', original: null, sale: 2280, note: '' },
+
+            // 模范马路店 (新模范马路九号小区)
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'B栋104', original: 2080, sale: 1780, note: '一口价' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'A栋108', original: 2180, sale: 1880, note: '一口价' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'A栋111', original: 2380, sale: 2080, note: '一口价' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'A栋301', original: 2380, sale: 2080, note: '一口价' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'B栋101', original: null, sale: 1880, note: '' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'B栋201', original: null, sale: 2380, note: '' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'A栋102', original: null, sale: 2080, note: '' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'A栋201', original: null, sale: 2280, note: '' },
+            { store: '模范马路店', address: '新模范马路九号小区', room: 'A栋305', original: null, sale: 2280, note: '' },
+
+            // 工人新村店
+            { store: '工人新村店', address: '109号3楼（清沐酒店旁）', room: '301', original: 2180, sale: 1880, note: '一口价' },
+            { store: '工人新村店', address: '109号3楼（清沐酒店旁）', room: '304', original: null, sale: 2080, note: '' },
+
+            // 浮桥店
+            { store: '浮桥店', address: '老虎桥18-2号', room: '8403', original: null, sale: 1480, note: '' },
+
+            // 新街口德基店
+            { store: '新街口德基店', address: '华侨路26号新兴大厦', room: '8518', original: 2480, sale: 2280, note: '一口价' },
+            { store: '新街口德基店', address: '华侨路26号新兴大厦', room: '8516', original: null, sale: 1380, note: '' },
+
+            // 来凤小区店
+            { store: '来凤小区店', address: '三山街地铁', room: '208', original: 2080, sale: 1780, note: '一口价' },
+            { store: '来凤小区店', address: '三山街地铁', room: '213', original: null, sale: 2380, note: '' },
+
+            // 双塘里66号店
+            { store: '双塘里66号店', address: '三山街地铁', room: '801', original: 2680, sale: 2380, note: '一口价' },
+
+            // 琥珀巷店
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '5栋101', original: 1480, sale: 1180, note: '一口价' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '7栋202', original: 2280, sale: 1980, note: '一口价' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '5栋104', original: null, sale: 1880, note: '' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '7栋104', original: null, sale: 1680, note: '预约看房' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '7栋101', original: null, sale: 1780, note: '预约看房' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '8栋106', original: null, sale: 1780, note: '8.18可住' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '员工宿舍四人间', original: null, sale: 600, note: '元/月/床' },
+            { store: '琥珀巷店', address: '琥珀巷高层小区9栋和10栋之间赛翁公寓', room: '员工宿舍六人间', original: null, sale: 500, note: '元/月/床' },
+
+            // 象房新村店
+            { store: '象房新村店', address: '象房新村15幢三单元', room: '103', original: 2380, sale: 1880, note: '一口价' },
+            { store: '象房新村店', address: '象房新村15幢三单元', room: '101', original: 2380, sale: 1980, note: '一口价' },
+            { store: '象房新村店', address: '象房新村15幢三单元', room: '502', original: null, sale: 1780, note: '' },
+            { store: '象房新村店', address: '象房新村15幢三单元', room: '201', original: null, sale: 2380, note: '' },
+
+            // 随园大厦店
+            { store: '随园大厦店', address: '珠江路 广州路 上海路', room: '25G-1', original: null, sale: 2080, note: '' },
+
+            // 紫峰店
+            { store: '紫峰店', address: '鼓楼地铁站', room: '601', original: null, sale: null, note: '员工宿舍' },
+            { store: '紫峰店', address: '鼓楼地铁站', room: '602/606/502', original: null, sale: 600, note: '7.20可约看，八人间整租元/月/床' },
+            { store: '紫峰店', address: '鼓楼地铁站', room: '505', original: null, sale: 680, note: '四间整租元/月' },
+            { store: '紫峰店', address: '鼓楼地铁站', room: '507', original: null, sale: 980, note: '双人间整租元/月' },
+
+            // 秦淮区江宁路三号店
+            { store: '秦淮区江宁路三号店', address: '秦淮区江宁路三号', room: '505', original: null, sale: 4180, note: '3室1厅' },
+
+            // 卫岗55号店
+            { store: '卫岗55号店', address: '苜蓿园 下马坊地铁', room: '13-107A', original: null, sale: 2580, note: '单室套1楼带院' },
+            { store: '卫岗55号店', address: '苜蓿园 下马坊地铁', room: '13-208', original: null, sale: 3180, note: '3室' },
+            { store: '卫岗55号店', address: '苜蓿园 下马坊地铁', room: '12-403/12-406', original: null, sale: 3380, note: '3室' },
+            { store: '卫岗55号店', address: '苜蓿园 下马坊地铁', room: '12-207', original: null, sale: 3580, note: '2室1厅' },
+            { store: '卫岗55号店', address: '苜蓿园 下马坊地铁', room: '98-202/12-306', original: null, sale: 3580, note: '3室1厅' }
+        ];
+
+        // ----- DOM 引用 -----
+        const container = document.getElementById('cardContainer');
+        const storeFilter = document.getElementById('storeFilter');
+        const priceMinInput = document.getElementById('priceMin');
+        const priceMaxInput = document.getElementById('priceMax');
+        const resetBtn = document.getElementById('resetFilterBtn');
+        const statsDisplay = document.getElementById('statsDisplay');
+        const footerCount = document.getElementById('footerCount');
+
+        // 门店列表（用于下拉）
+        const storeSet = new Set();
+        rawData.forEach(item => {
+            if (item.store) storeSet.add(item.store);
+        });
+        const storeList = Array.from(storeSet).sort();
+
+        // 渲染下拉
+        storeList.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            storeFilter.appendChild(opt);
+        });
+
+        // ----- 辅助函数 -----
+        function getSaleDisplay(sale) {
+            if (sale === null || sale === undefined) return '—';
+            return `¥${sale}`;
+        }
+
+        function getOriginalDisplay(original) {
+            if (original === null || original === undefined) return null;
+            return `¥${original}`;
+        }
+
+        function renderCards(filtered) {
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="no-result">🏷️ 没有匹配的房源，试试调整筛选条件</div>`;
+                statsDisplay.textContent = '共 0 套';
+                footerCount.textContent = '0 条房源';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(item => {
+                const originalHtml = item.original ? `<span class="price-original">¥${item.original}</span>` : '';
+                // 一口价/月租 展示
+                let priceHtml = '';
+                if (item.sale !== null && item.sale !== undefined) {
+                    priceHtml = `<span class="price-sale">¥${item.sale} <small>月租</small></span>`;
+                } else {
+                    priceHtml = `<span class="price-only">—</span>`;
+                }
+
+                // 备注标签
+                let noteTag = '';
+                if (item.note) {
+                    noteTag = `<span class="tag">${item.note}</span>`;
+                }
+
+                // 点击卡片显示详情
+                const detailMsg = `🏠 ${item.store}\n📍 ${item.address}\n🔑 ${item.room}\n💰 ${item.original ? '原价: ¥' + item.original : '无原价'}\n💵 月租: ${item.sale ? '¥' + item.sale : '待询'}\n📝 ${item.note || '无备注'}`;
+
+                html += `
+                    <div class="property-card" onclick="alert('${detailMsg.replace(/'/g, "\\'")}')">
+                        <div class="store-name">${item.store}</div>
+                        <div class="store-address">
+                            <span>📍 ${item.address}</span>
+                            <span class="addr-tag">${item.room}</span>
+                        </div>
+                        <div class="room-badge">${item.room}</div>
+                        <div class="price-row">
+                            ${originalHtml}
+                            ${priceHtml}
+                        </div>
+                        <div class="meta-footer">
+                            ${noteTag}
+                            <span class="note">${item.note || '普通房源'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            statsDisplay.textContent = `共 ${filtered.length} 套`;
+            footerCount.textContent = `${filtered.length} 条房源`;
+        }
+
+        // ----- 筛选逻辑 -----
+        function filterData() {
+            const storeVal = storeFilter.value;
+            const minVal = parseFloat(priceMinInput.value);
+            const maxVal = parseFloat(priceMaxInput.value);
+
+            let filtered = rawData.filter(item => {
+                // 门店筛选
+                if (storeVal && item.store !== storeVal) return false;
+
+                // 价格筛选 (基于月租 sale)
+                const price = item.sale;
+                if (price === null || price === undefined) {
+                    // 如果价格为空，在价格筛选时默认通过（但若设了范围，则过滤掉）
+                    if (!isNaN(minVal) || !isNaN(maxVal)) return false;
+                    return true;
+                }
+                if (!isNaN(minVal) && price < minVal) return false;
+                if (!isNaN(maxVal) && price > maxVal) return false;
+                return true;
+            });
+
+            renderCards(filtered);
+        }
+
+        // ----- 重置 -----
+        function resetFilters() {
+            storeFilter.value = '';
+            priceMinInput.value = '';
+            priceMaxInput.value = '';
+            filterData();
+        }
+
+        // ----- 事件绑定 -----
+        storeFilter.addEventListener('change', filterData);
+        priceMinInput.addEventListener('input', filterData);
+        priceMaxInput.addEventListener('input', filterData);
+        resetBtn.addEventListener('click', resetFilters);
+
+        // 初始渲染
+        renderCards(rawData);
+    })();
+</script>
+</body>
+</html>
