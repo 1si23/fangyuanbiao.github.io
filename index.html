@@ -63,7 +63,7 @@
 
 <script>
     // ================================================================
-    // 🔑 数据地址（确认这个链接能访问）
+    // 🔑 数据地址
     // ================================================================
     const DATA_URL = 'https://raw.githubusercontent.com/1si23/fangyuanbiao.github.io/main/data.json';
 
@@ -81,30 +81,54 @@
     const resetBtn = document.getElementById('resetFilterBtn');
     const updateTime = document.getElementById('updateTime');
 
+    // 自动修复图片链接
+    function fixImageUrl(url) {
+        if (!url) return null;
+        let fixed = url.trim();
+        // github.com/.../blob/ → raw.githubusercontent.com/.../
+        if (fixed.includes('github.com') && fixed.includes('/blob/')) {
+            fixed = fixed.replace('github.com', 'raw.githubusercontent.com')
+                         .replace('/blob/', '/');
+        }
+        // 去掉 ?raw=true
+        if (fixed.includes('?raw=true')) {
+            fixed = fixed.replace('?raw=true', '');
+        }
+        return fixed;
+    }
+
     async function loadData() {
         try {
             const response = await fetch(DATA_URL);
-            if (!response.ok) throw new Error(`HTTP ${response.status} — 请检查 data.json 是否存在`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             if (!Array.isArray(data) || data.length === 0) {
                 throw new Error('data.json 数据为空或格式不正确');
             }
-            allData = data.map(item => ({
-                area: item.区域 || '',
-                store: item.门店名称 || '',
-                address: item.地址 || '',
-                room: item.房间号 || item['房间号/户型'] || '',
-                original: item.原价 ? Number(item.原价) : null,
-                sale: item.月租 || item['一口价/月租'] ? Number(item.月租 || item['一口价/月租']) : null,
-                note: item.备注 || '',
-                utility: item.水电 || '',
-                images: Array.isArray(item.图片) ? item.图片 : (item.图片 ? [item.图片] : []),
-                videos: Array.isArray(item.视频) ? item.视频 : (item.视频 ? [item.视频] : [])
-            }));
+            allData = data.map(item => {
+                let images = Array.isArray(item.图片) ? item.图片 : (item.图片 ? [item.图片] : []);
+                images = images.map(url => fixImageUrl(url)).filter(Boolean);
+                
+                let videos = Array.isArray(item.视频) ? item.视频 : (item.视频 ? [item.视频] : []);
+                videos = videos.map(url => fixImageUrl(url)).filter(Boolean);
+
+                return {
+                    area: item.区域 || '',
+                    store: item.门店名称 || '',
+                    address: item.地址 || '',
+                    room: item.房间号 || item['房间号/户型'] || '',
+                    original: item.原价 ? Number(item.原价) : null,
+                    sale: item.月租 || item['一口价/月租'] ? Number(item.月租 || item['一口价/月租']) : null,
+                    note: item.备注 || '',
+                    utility: item.水电 || '',
+                    images: images,
+                    videos: videos
+                };
+            });
             populateFilters();
             renderCards(allData);
         } catch (error) {
-            container.innerHTML = `<div class="error">❌ 加载失败：${error.message}<br><small>请确认 data.json 文件存在且格式正确</small></div>`;
+            container.innerHTML = `<div class="error">❌ 加载失败：${error.message}</div>`;
         }
     }
 
@@ -117,7 +141,7 @@
 
     function renderCards(filtered) {
         if (!filtered || filtered.length === 0) {
-            container.innerHTML = `<div class="loading" style="padding:40px;">🏷️ 没有匹配的房源，试试调整筛选条件</div>`;
+            container.innerHTML = `<div class="loading">🏷️ 没有匹配的房源</div>`;
             return;
         }
         let html = '';
@@ -129,16 +153,14 @@
             if (item.images && item.images.length > 0) {
                 const validImages = item.images.filter(url => url && url.startsWith('http'));
                 if (validImages.length > 0) {
-                    const showImgs = validImages.slice(0, 3);
-                    imgHtml = showImgs.map(url => `< img src="${url}" alt="房源图片" loading="lazy" onerror="this.style.display='none'">`).join('');
-                    if (validImages.length > 3) {
-                        imgHtml += `<div style="color:#61758f;font-size:0.8rem;text-align:center;">+${validImages.length - 3} 张更多图片</div>`;
-                    }
+                    imgHtml = validImages.slice(0, 3).map(url => 
+                        `< img src="${url}" alt="房源图片" loading="lazy" onerror="this.style.display='none'">`
+                    ).join('');
                 }
             }
             let videoHtml = '';
             if (item.videos && item.videos.length > 0 && item.videos[0]) {
-                videoHtml = `<video controls preload="metadata" style="width:100%;border-radius:12px;max-height:200px;"><source src="${item.videos[0]}" type="video/mp4">您的浏览器不支持视频</video>`;
+                videoHtml = `<video controls preload="metadata" style="width:100%;border-radius:12px;max-height:200px;"><source src="${item.videos[0]}" type="video/mp4"></video>`;
             }
             const mediaHtml = (imgHtml || videoHtml) ? `<div class="media">${imgHtml}${videoHtml}</div>` : `<div class="media"><div class="no-media">📭 暂无图片或视频</div></div>`;
 
