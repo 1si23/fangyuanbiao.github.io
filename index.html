@@ -85,16 +85,13 @@
     function fixImageUrl(url) {
         if (!url) return null;
         let fixed = url.trim();
-        // github.com/.../blob/ → raw.githubusercontent.com/.../
         if (fixed.includes('github.com') && fixed.includes('/blob/')) {
             fixed = fixed.replace('github.com', 'raw.githubusercontent.com')
                          .replace('/blob/', '/');
         }
-        // 去掉 ?raw=true
         if (fixed.includes('?raw=true')) {
             fixed = fixed.replace('?raw=true', '');
         }
-        // 去掉 /refs/heads/
         if (fixed.includes('/refs/heads/')) {
             fixed = fixed.replace('/refs/heads/', '/');
         }
