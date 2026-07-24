@@ -94,6 +94,10 @@
         if (fixed.includes('?raw=true')) {
             fixed = fixed.replace('?raw=true', '');
         }
+        // 去掉 /refs/heads/
+        if (fixed.includes('/refs/heads/')) {
+            fixed = fixed.replace('/refs/heads/', '/');
+        }
         return fixed;
     }
 
